@@ -1,7 +1,9 @@
+const { Prisma } = require("@prisma/client");
+
 const { createProfileRecord, findProfileById } = require("../services/profileService");
 const { badRequestError, notFoundError } = require("../utils/httpErrors");
 
-function createProfile(request, response, next) {
+async function createProfile(request, response, next) {
   try {
     const { name, area, role, level, goals } = request.body || {};
 
@@ -11,7 +13,7 @@ function createProfile(request, response, next) {
     validateRequiredString("level", level);
     validateRequiredString("goals", goals);
 
-    const profile = createProfileRecord({
+    const profile = await createProfileRecord({
       name,
       area,
       role,
@@ -25,16 +27,20 @@ function createProfile(request, response, next) {
       profile,
     });
   } catch (error) {
+    if (isDatabaseUnavailableError(error)) {
+      return next(badRequestError("Database is unavailable. Configure DATABASE_URL and run Prisma migrations."));
+    }
+
     next(error);
   }
 }
 
-function getProfile(request, response, next) {
+async function getProfile(request, response, next) {
   try {
     const profileId = request.params.id;
     validateRequiredString("id", profileId);
 
-    const profile = findProfileById(profileId);
+    const profile = await findProfileById(profileId);
 
     if (!profile) {
       throw notFoundError("Profile not found");
@@ -42,6 +48,10 @@ function getProfile(request, response, next) {
 
     response.status(200).json(profile);
   } catch (error) {
+    if (isDatabaseUnavailableError(error)) {
+      return next(badRequestError("Database is unavailable. Configure DATABASE_URL and run Prisma migrations."));
+    }
+
     next(error);
   }
 }
@@ -50,6 +60,13 @@ function validateRequiredString(field, value) {
   if (typeof value !== "string" || value.trim() === "") {
     throw badRequestError(`Missing required field: ${field}`);
   }
+}
+
+function isDatabaseUnavailableError(error) {
+  return (
+    error instanceof Prisma.PrismaClientInitializationError ||
+    error instanceof Prisma.PrismaClientKnownRequestError
+  );
 }
 
 module.exports = {

@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: tutor-api
+    runtime: node
+    rootDir: .
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run prisma:migrate:deploy && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: GROQ_CHAT_MODEL
+        value: mixtral-8x7b-32768
+      - key: GROQ_TRANSCRIBE_MODEL
+        value: whisper-large-v3
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tutor-api-db
+          property: connectionString
+
+databases:
+  - name: tutor-api-db
+    plan: free
+    databaseName: tutor_api
+    user: tutor_api_user

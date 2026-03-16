@@ -111,16 +111,6 @@ function buildSystemPrompt(profile) {
   ].join(" ");
 }
 
-function sanitizeConversationHistory(conversationHistory) {
-  return conversationHistory
-    .filter((item) => item && (item.role === "user" || item.role === "assistant"))
-    .map((item) => ({
-      role: item.role,
-      content: String(item.content || ""),
-    }))
-    .filter((item) => item.content.trim() !== "");
-}
-
 function buildFallbackChatReply({ message, profile }) {
   const normalizedMessage = message.trim();
   const roleLabel = profile.role || profile.area;
@@ -142,7 +132,18 @@ function getErrorDetails(error) {
   return error.response?.data || error.message || "Unknown error";
 }
 
+function sanitizeConversationHistory(conversationHistory) {
+  return conversationHistory
+    .filter((item) => item && (item.role === "user" || item.role === "assistant"))
+    .map((item) => ({
+      role: item.role,
+      content: String(item.content || ""),
+    }))
+    .filter((item) => item.content.trim() !== "");
+}
+
 module.exports = {
   buildChatReply,
   buildTranscription,
+  sanitizeConversationHistory,
 };

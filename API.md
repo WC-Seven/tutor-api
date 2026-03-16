@@ -1,5 +1,15 @@
 # API Documentation - English Learning App
 
+## Deploy
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/WC-Seven/tutor-api)
+
+### One-click deploy notes
+
+- O botao acima usa o arquivo [`render.yaml`](C:/dev_local/html/tutor/tutor-api/render.yaml) na raiz do repositorio `https://github.com/WC-Seven/tutor-api`.
+- No Render, sera necessario preencher a variavel `GROQ_API_KEY`.
+- O banco Postgres e as migrations Prisma estao preparados para o fluxo de deploy via `render.yaml`.
+
 ## 📋 Índice
 1. [Visão Geral](#visão-geral)
 2. [Autenticação](#autenticação)
